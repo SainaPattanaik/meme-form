@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Feedback</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            width: 50%;
+            text-align: center;
+        }
+        .button-container {
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function submitForm(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch("https://script.google.com/macros/s/AKfycbz4SvwjV6nofUGsMVF-ScFpCDCxXedBk5W-KXVfxRfMGw2P8M3A7giHMygmyjeQ6e6W/exec", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.text())
+            .then(() => {
+                alert("Thank you for your response!"); // Show popup message
+                window.close(); // Close the tab
+            })
+            .catch(error => console.error("Error!", error.message));
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Meme Feedback</h2>
+    <form onsubmit="submitForm(event)">
+        <div>
+            <h3>On which product do you relate to or feel comfortable with?</h3>
+            <textarea id="text-input" name="textInput" rows="5" maxlength="100" placeholder="Type your response here (up to 20 words)"></textarea>
+        </div>
+
+        <div class="button-container">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

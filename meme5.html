@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Sentiment Responses</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+        }
+        .image {
+            flex: 1;
+            padding-right: 20px;
+        }
+        .questions {
+            flex: 2;
+        }
+        .conditional-options {
+            display: none;
+            margin-top: 10px;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        function showNextQuestion() {
+            const selectedValue = document.querySelector('input[name="sentiment"]:checked')?.value;
+            const conditionalOptions = document.getElementById('conditional-options');
+
+            if (selectedValue === 'positive' || selectedValue === 'negative') {
+                conditionalOptions.style.display = 'block';
+            } else {
+                conditionalOptions.style.display = 'none';
+            }
+        }
+
+        function validateForm() {
+            const textInput = document.getElementById("text-input").value.trim();
+            const sentimentSelected = document.querySelector('input[name="sentiment"]:checked');
+            const ratingSelected = document.querySelector('input[name="rating"]:checked');
+
+            if (!textInput) {
+                alert("Please describe your thoughts on the meme.");
+                return false;
+            }
+
+            if (!sentimentSelected) {
+                alert("Please select the impact of this meme.");
+                return false;
+            }
+
+            // If "Positive" or "Negative" is selected, ensure a rating is also selected
+            if ((sentimentSelected.value === "positive" || sentimentSelected.value === "negative") && !ratingSelected) {
+                alert("Please rate your judgment.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function submitForm(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            if (!validateForm()) return; // Stop submission if validation fails
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch("https://script.google.com/macros/s/AKfycbz4SvwjV6nofUGsMVF-ScFpCDCxXedBk5W-KXVfxRfMGw2P8M3A7giHMygmyjeQ6e6W/exec", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.text())
+            .then(() => {
+                window.open("meme1.html", "_blank"); // Open next page in a new tab
+            })
+            .catch(error => console.error("Error!", error.message));
+        }
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <div class="image">
+        <img src="./memes/6.jpg" alt="Description of Image" style="max-width: 100%; height: auto;">
+    </div>
+    <div class="questions">
+        <h2>Questions</h2>
+        <form onsubmit="submitForm(event)">
+            <div>
+                <h3>Please describe your thoughts on the meme:</h3>
+                <textarea id="text-input" name="textInput" rows="12" maxlength="100" placeholder="Type your response here (up to 30 words)"></textarea>
+            </div>
+
+            <div>
+                <h3>What's the impact of this particular meme?</h3>
+                <ul>
+                    <li>
+                        <input type="radio" name="sentiment" value="positive" onclick="showNextQuestion()"> POSITIVE
+                    </li>
+                    <li>
+                        <input type="radio" name="sentiment" value="negative" onclick="showNextQuestion()"> NEGATIVE
+                    </li>
+                    <li>
+                        <input type="radio" name="sentiment" value="neutral" onclick="showNextQuestion()"> NEUTRAL
+                    </li>
+                    <li>
+                        <input type="radio" name="sentiment" value="others" onclick="showNextQuestion()"> NOT KNOWN
+                    </li>
+                </ul>
+                <div class="conditional-options" id="conditional-options">
+                    <h3>How would you rate your judgment (based on your chosen option)?</h3>
+                    <p>(E.g., If you chose positive: 1-Very Low, 5-Very High)</p>
+                    <ul>
+                        <li><input type="radio" name="rating" value="1"> 1</li>
+                        <li><input type="radio" name="rating" value="2"> 2</li>
+                        <li><input type="radio" name="rating" value="3"> 3</li>
+                        <li><input type="radio" name="rating" value="4"> 4</li>
+                        <li><input type="radio" name="rating" value="5"> 5</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button type="submit">Submit & Next</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
