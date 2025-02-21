@@ -8,15 +8,35 @@ function ensureSheetExists(sheetName, type) {
 
   // If sheet doesn't exist, create it and add headers
   if (!sheet) {
-    if (type === "feedback") {
+    if (type === "info") {
       sheet = ss.insertSheet(sheetName);
 
       // Set headers
-      sheet.getRange("A1").setValue("TIMESTAMP");
-      sheet.getRange("B1").setValue("TEXT");
+      sheet.getRange("A1").setValue("ID");
+      sheet.getRange("B1").setValue("TIMESTAMP");
+      sheet.getRange("C1").setValue("EMAIL");
 
       // Format headers
-      const headerRange = sheet.getRange("A1:B1");
+      const headerRange = sheet.getRange("A1:C1");
+      headerRange.setFontWeight("bold");
+      headerRange.setBackground("#E8E8E8");
+
+      // Freeze the header row
+      sheet.setFrozenRows(1);
+
+      // Adjust column widths
+      sheet.setColumnWidth(1, 150); // Timestamp
+      sheet.setColumnWidth(2, 300); // Text
+    } else if (type === "feedback") {
+      sheet = ss.insertSheet(sheetName);
+
+      // Set headers
+      sheet.getRange("A1").setValue("ID");
+      sheet.getRange("B1").setValue("TIMESTAMP");
+      sheet.getRange("C1").setValue("TEXT");
+
+      // Format headers
+      const headerRange = sheet.getRange("A1:C1");
       headerRange.setFontWeight("bold");
       headerRange.setBackground("#E8E8E8");
 
@@ -30,13 +50,14 @@ function ensureSheetExists(sheetName, type) {
       sheet = ss.insertSheet(sheetName);
 
       // Set headers
-      sheet.getRange("A1").setValue("TIMESTAMP");
-      sheet.getRange("B1").setValue("TEXT");
-      sheet.getRange("C1").setValue("SENTIMENT");
-      sheet.getRange("D1").setValue("RATING");
+      sheet.getRange("A1").setValue("ID");
+      sheet.getRange("B1").setValue("TIMESTAMP");
+      sheet.getRange("C1").setValue("TEXT");
+      sheet.getRange("D1").setValue("SENTIMENT");
+      sheet.getRange("E1").setValue("RATING");
 
       // Format headers
-      const headerRange = sheet.getRange("A1:D1");
+      const headerRange = sheet.getRange("A1:E1");
       headerRange.setFontWeight("bold");
       headerRange.setBackground("#E8E8E8");
 
@@ -70,9 +91,18 @@ function doPost(e) {
     const timestamp = new Date();
 
     // Prepare the row data
-    const rowData = [timestamp, data.textInput, data.sentiment, data.rating];
-
-    // Append the row
+    let rowData = [];
+    if (data.type === "info") {
+      rowData = [data.uniqueID, timestamp, data.email];
+    } else {
+      rowData = [
+        data.uniqueID,
+        timestamp,
+        data.textInput,
+        data.sentiment,
+        data.rating,
+      ];
+    }
     sheet.appendRow(rowData);
 
     // Return success response

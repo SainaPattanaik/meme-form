@@ -126,6 +126,10 @@
       document.addEventListener("DOMContentLoaded", () => {
         const memes = [
           {
+            type: "info",
+            sheetName: "Info",
+          },
+          {
             image: "./memes/1.jpg",
             sheetName: "Meme1",
           },
@@ -158,6 +162,7 @@
         const memeContainers = document.getElementById("memeContainers");
         const loadingOverlay = document.querySelector(".loading-overlay");
         const thankYouMessage = document.getElementById("thankYouMessage");
+        let gUniqueID = null;
         let currentMemeIndex = 0;
 
         function showLoading() {
@@ -210,12 +215,28 @@
           const container = document.createElement("div");
           container.id = `meme-${index}`;
 
-          if (meme.type === "feedback") {
+          if (meme.type === "info") {
+            container.innerHTML = `
+            <div class="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Please Enter Your Email</h2>
+                <p class="text-sm text-gray-700 mb-3">
+                    This survey is designed to collect your thoughts and feedback on a series of memes. 
+                    Please take your time to answer the questions thoughtfully and honestly. 
+                    Your responses will be kept confidential and used for research purposes only.
+                </p>
+                <form id="memeForm-${index}" class="space-y-6">
+                    <div class="flex flex-col gap-3 justify-end">
+                       <input type="text" name="email" placeholder="Enter your email" class="w-full rounded-md border p-2">
+                       <button type="submit" class="w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Next</button>
+                    </div>
+                </form>
+            </div>`;
+          } else if (meme.type === "feedback") {
             container.innerHTML = `
             <div class="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Meme Feedback</h2>
                 
-                <form onsubmit="submitFeedback(event)">
+                <form onsubmit="submitFeedback(event,'${gUniqueID}')">
                     <div class="mb-6">
                         <h3 class="text-lg font-medium text-gray-700 mb-3">
                             On which product do you relate to or feel comfortable with?
@@ -249,18 +270,16 @@
             }" class="w-full rounded-lg">
               </div>
               <div class="space-y-6">
-                <h2 class="text-2xl font-bold">Questions for Meme ${
-                  index + 1
-                }</h2>
+                <h2 class="text-2xl font-bold">Questions for Meme ${index}</h2>
                 <form id="memeForm-${index}" class="space-y-6">
                   <div>
-                    <h3 class="mb-2 text-lg font-semibold">Please describe your thoughts on the meme:</h3>
+                    <h3 class="mb-2 text-lg font-semibold">Please describe your thoughts on the meme (comments should be in english):</h3>
                     <textarea id="text-input-${index}" name="textInput" rows="6" minlength="10" placeholder="Type your response here (up to 30 words)" class="w-full rounded-md border p-2"></textarea>
                   </div>
                   <div>
                     <h3 class="mb-2 text-lg font-semibold">What's the impact of this particular meme?</h3>
                     <div class="space-y-2">
-                      ${["positive", "negative", "neutral", "others"]
+                      ${["positive", "negative", "neutral", "unclear"]
                         .map(
                           (value) => `
                             <label class="flex items-center space-x-2">
@@ -325,8 +344,32 @@
           });
         }
 
+        function isValidEmail(email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email);
+        }
+
         function validateForm(index) {
           const form = document.getElementById(`memeForm-${index}`);
+
+          const meme = memes[index];
+          if (meme.type === "info") {
+            const email = form
+              .querySelector('input[name="email"]')
+              .value.trim();
+            if (!email) {
+              alert("Please enter your email.");
+              return false;
+            }
+
+            if (!isValidEmail(email)) {
+              alert("Please enter a valid email.");
+              return false;
+            }
+
+            return true;
+          }
+
           const textInput = document
             .getElementById(`text-input-${index}`)
             .value.trim();
@@ -359,6 +402,18 @@
           const form = document.getElementById(`memeForm-${index}`);
           const formData = new FormData(form);
           formData.append("sheetName", memes[index].sheetName);
+          formData.append("type", memes[index].type);
+
+          if (memes[index].type === "info") {
+            const uniqueID = `${Date.now()}${Math.random()
+              .toString(36)
+              .substr(2, 9)}`;
+
+            formData.append("uniqueID", uniqueID);
+            gUniqueID = uniqueID;
+          } else if (gUniqueID) {
+            formData.append("uniqueID", gUniqueID);
+          }
 
           showLoading();
 
@@ -385,7 +440,7 @@
         renderMeme(currentMemeIndex);
       });
 
-      function submitFeedback(event) {
+      function submitFeedback(event, gUniqueID) {
         const loadingOverlay = document.querySelector(".loading-overlay");
         function showLoading() {
           loadingOverlay.classList.add("active");
@@ -409,6 +464,7 @@
         const formData = new FormData(form);
         formData.append("sheetName", "Feedback");
         formData.append("type", "feedback");
+        formData.append("uniqueID", gUniqueID);
 
         showLoading();
 
