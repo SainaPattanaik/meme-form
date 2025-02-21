@@ -122,7 +122,7 @@
 
     <script>
       const POST_URL =
-        "https://script.google.com/macros/s/AKfycbzuWAolUtkcMtb0qFXUvnoRp1_gfmBF8mDfaCM72xyVVHjearyaRXqczYrgG0ZjNScSNw/exec";
+        "https://script.google.com/macros/s/AKfycbwvGaFUKv0H8ikyMC5PMcyl-1pMdWEaR4adUI6eMUu_W4VmwuNedVwL6nI_mi6WKP2Rpw/exec";
       document.addEventListener("DOMContentLoaded", () => {
         const memes = [
           {
@@ -226,7 +226,8 @@
                 </p>
                 <form id="memeForm-${index}" class="space-y-6">
                     <div class="flex flex-col gap-3 justify-end">
-                       <input type="text" name="email" placeholder="Enter your email" class="w-full rounded-md border p-2">
+                       <input type="text" name="fullname" placeholder="Enter your fullname" class="w-full rounded-md border p-2">
+                       <input type="email" name="email" placeholder="Enter your email" class="w-full rounded-md border p-2">
                        <button type="submit" class="w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Next</button>
                     </div>
                 </form>
@@ -357,6 +358,13 @@
             const email = form
               .querySelector('input[name="email"]')
               .value.trim();
+            const fullname = form.querySelector('input[name="fullname"]').value;
+
+            if (!fullname) {
+              alert("Please enter your fullname.");
+              return false;
+            }
+
             if (!email) {
               alert("Please enter your email.");
               return false;

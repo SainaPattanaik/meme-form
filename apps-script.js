@@ -14,10 +14,11 @@ function ensureSheetExists(sheetName, type) {
       // Set headers
       sheet.getRange("A1").setValue("ID");
       sheet.getRange("B1").setValue("TIMESTAMP");
-      sheet.getRange("C1").setValue("EMAIL");
+      sheet.getRange("C1").setValue("FULL NAME");
+      sheet.getRange("D1").setValue("EMAIL");
 
       // Format headers
-      const headerRange = sheet.getRange("A1:C1");
+      const headerRange = sheet.getRange("A1:D1");
       headerRange.setFontWeight("bold");
       headerRange.setBackground("#E8E8E8");
 
@@ -93,7 +94,7 @@ function doPost(e) {
     // Prepare the row data
     let rowData = [];
     if (data.type === "info") {
-      rowData = [data.uniqueID, timestamp, data.email];
+      rowData = [data.uniqueID, timestamp, data.fullname, data.email];
     } else {
       rowData = [
         data.uniqueID,
